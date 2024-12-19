@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class EmployeeSchema(BaseModel):
     employee_id: int
@@ -38,4 +38,3 @@ class PaginatedEmployeesResponse(BaseModel):
                 ]
             }
         }
-}

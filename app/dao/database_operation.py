@@ -1,5 +1,3 @@
-# app/dao/database_operation.py
-
 from app.db.connection import get_collection
 from app.db.schema import EmployeeSchema
 from typing import List, Optional
@@ -7,15 +5,32 @@ from typing import List, Optional
 # Retrieve the 'employees' collection
 employees_collection = get_collection("employees")
 
-def get_all_employees() -> List[EmployeeSchema]:
+def get_all_employees(skip: int, limit: int) -> List[EmployeeSchema]:
     """
-    Retrieve all employees from the database.
+    Retrieve all employees from the database with pagination.
+    
+    Args:
+        skip (int): Number of records to skip.
+        limit (int): Number of records to fetch.
     
     Returns:
-        List[EmployeeSchema]: A list of all employee records.
+        List[EmployeeSchema]: A paginated list of employee records.
     """
-    employees = employees_collection.find({}, {"_id": 0})
+    employees = employees_collection.find({}, {"_id": 0}).skip(skip).limit(limit)
     return [EmployeeSchema(**emp) for emp in employees]
+
+def create_multiple_employees(employees: List[EmployeeSchema]) -> dict:
+    """
+    Insert multiple employees into the database.
+    
+    Args:
+        employees (List[EmployeeSchema]): List of employee data to insert.
+    
+    Returns:
+        dict: Information about the insert operation.
+    """
+    result = employees_collection.insert_many([employee.dict() for employee in employees])
+    return {"inserted": len(result.inserted_ids)}
 
 def get_employee_by_id(employee_id: int) -> Optional[EmployeeSchema]:
     """

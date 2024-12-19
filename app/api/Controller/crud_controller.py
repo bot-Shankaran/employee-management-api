@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from app.db.schema import EmployeeSchema, PaginatedEmployeesResponse
+from app.db.schema import EmployeeSchema
 from app.dao.database_operation import (
     get_all_employees,
     get_employee_by_id,

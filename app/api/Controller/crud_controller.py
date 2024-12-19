@@ -7,6 +7,10 @@ from app.dao.database_operation import (
     update_employee,
     delete_employee
 )
+from typing import Optional
+from app.db.schema import PaginatedEmployeesResponse
+
+
 
 router = APIRouter(
     prefix="/employees",
@@ -69,3 +73,38 @@ def remove_employee(employee_id: int):
             detail="Employee not found."
         )
     return {"message": "Employee deleted successfully."}
+
+@router.get("/cursor", response_model=PaginatedEmployeesResponse, summary="Retrieve Employees Using Cursor-Based Pagination")
+def read_employees_cursor(last_employee_id: Optional[int] = Query(None, description="The last employee_id from the previous page"),
+                          page_size: int = Query(10, ge=1, le=100, description="Number of employees per page")):
+    """
+    GET /employees/cursor
+    Retrieve employees using cursor-based pagination.
+    
+    Args:
+        last_employee_id (int, optional): The employee_id after which to fetch employees.
+        page_size (int): Number of employees to fetch.
+    
+    Returns:
+        PaginatedEmployeesResponse: A response containing the next_employee_id and a list of employees.
+    """
+    if last_employee_id is None:
+        # Fetch the first page
+        employees = employees_collection.find({}, {"_id": 0}).sort("employee_id", 1).limit(page_size)
+    else:
+        # Fetch employees after the last_employee_id
+        employees = employees_collection.find(
+            {"employee_id": {"$gt": last_employee_id}},
+            {"_id": 0}
+        ).sort("employee_id", 1).limit(page_size)
+    
+    employees_list = [EmployeeSchema(**emp) for emp in employees]
+    if employees_list:
+        next_employee_id = employees_list[-1].employee_id
+    else:
+        next_employee_id = None
+    
+    return {
+        "next_employee_id": next_employee_id,
+        "employees": employees_list
+    }

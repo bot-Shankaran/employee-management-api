@@ -1,5 +1,3 @@
-# app/config/schema.py
-
 from pydantic import BaseModel
 from typing import List
 
@@ -17,12 +15,14 @@ class EmployeeSchema(BaseModel):
             }
         }
 
-class EmployeesListSchema(BaseModel):#Represents a response containing a list of employees.
+class PaginatedEmployeesResponse(BaseModel):
+    next_employee_id: Optional[int] = None
     employees: List[EmployeeSchema]
 
     class Config:
         schema_extra = {
             "example": {
+                "next_employee_id": 510,
                 "employees": [
                     {
                         "employee_id": 501,
@@ -33,7 +33,9 @@ class EmployeesListSchema(BaseModel):#Represents a response containing a list of
                         "employee_id": 502,
                         "role": "Software Engineer",
                         "work_experience": 3
-                    }
+                    },
+                    
                 ]
             }
         }
+}

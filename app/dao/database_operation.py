@@ -1,5 +1,3 @@
-# app/dao/database_operation.py
-
 from app.db.connection import get_collection
 from app.db.schema import EmployeeSchema
 from typing import List, Optional
@@ -71,3 +69,9 @@ def delete_employee(employee_id: int) -> bool:
     """
     result = employees_collection.delete_one({"employee_id": employee_id})
     return result.deleted_count > 0
+
+# Pagination with skip and limit
+def get_employees_paginated(page: int = 1, page_size: int = 10) -> List[EmployeeSchema]:
+    skip = (page - 1) * page_size
+    employees = employees_collection.find({}, {"_id": 0}).skip(skip).limit(page_size)
+    return [EmployeeSchema(**emp) for emp in employees]

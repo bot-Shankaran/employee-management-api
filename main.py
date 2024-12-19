@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.Controller.lead_controller import router as employee_router
+from app.api.Controller.crud_controller import router as employee_router
 from app.Utility.EnvConfig import MONGO_URI, DB_NAME
 import uvicorn
 
